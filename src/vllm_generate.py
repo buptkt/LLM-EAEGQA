@@ -5,7 +5,7 @@ import json
 from tqdm import tqdm
 import re
 
-# llm = LLM(model="/data/sdb2/lkt/LLMs/Llama-2-13b-chat-ms", gpu_memory_utilization=0.9)
+# llm = LLM(model="Llama-2-13b-chat-ms", gpu_memory_utilization=0.9)
 
 # # Create a sampling params object.
 # sampling_params = SamplingParams(temperature=0.8, top_p=0.95, max_tokens=512)
@@ -46,12 +46,12 @@ from openai import OpenAI
 #     base_url=openai_api_base,
 # )
 client = None
-def chat(examples, split, modelname='qwen2.5-32b-int8'):
+def chat(examples, split, modelname='qwen2.5'):
     nf = open(f'{split}-{modelname}-ACE05.jsonl', 'w')
     for example in tqdm(examples):
         messages = example['messages']
         chat_response = client.chat.completions.create(
-            model="/data/sdb2/lkt/LLMs/Qwen2.5-72B-Instruct-GPTQ-Int4",
+            model=Qwen2.5-72B-Instruct",
             messages=messages,
             temperature=0.7,
             top_p=0.8,
@@ -94,8 +94,8 @@ def run():
 
 
 def split_jsonl(split):
-    f = open(f'/data/sdb2/lkt/eeqga/utils/{split}-Llama-2-13b-chat-ms-ACE05.jsonl', 'r')
-    nf = open(f'/data/sdb2/lkt/eeqga/utils/{split}-Llama-2-13b-chat-ms-ACE05-cleaned.jsonl', 'w')
+    f = open(f'Llama-2-13b-chat-ms-ACE05.jsonl', 'r')
+    nf = open(f'Llama-2-13b-chat-ms-ACE05-cleaned.jsonl', 'w')
     text = f.read()
     lines = ['{"custom_id":' + x for x in text.split('{"custom_id":')]
     for line in lines:
@@ -160,23 +160,6 @@ def cal_LLM_res(filepath):
                 if '-' in start:
                     start = start.split('-')[0]
                     cnt += 1
-                sent_ids = [sentindex for sentindex, sentvalue in enumerate(input_sent.split()) if sentvalue == start]
-                # 预测span错误，补救措施
-                if (one_arg_s >= len(input_sent.split()) or one_arg_e >= len(input_sent.split()) or ' '.join(input_sent.split()[one_arg_s: one_arg_e + 1]) != one_pre_arg) and len(sent_ids) > 0:
-                    sent_ids = sorted(sent_ids, key=lambda x: abs(x - one_arg_s))
-                    for ids in sent_ids:
-                        if ' '.join(input_sent.split()[ids: ids + len(one_pre_arg.split())]) == one_pre_arg:
-                            one_arg_s = ids
-                            one_arg_e = one_arg_s + cnt - 1
-                            break
-                elif one_arg_s < len(input_sent.split()) and one_arg_e < len(input_sent.split()) and len(sent_ids) == 0:
-                    one_pre_arg = ' '.join(input_sent.split()[one_arg_s: one_arg_e + 1])
-                elif (one_arg_s >= len(input_sent.split()) or one_arg_e >= len(input_sent.split()) or ' '.join(input_sent.split()[one_arg_s: one_arg_e + 1]) != one_pre_arg) and len(sent_ids) == 0:
-                    invalid += 1
-                    continue
-                else:
-                    invalid += 1
-                    continue
             else:
                 one_arg_s = input_sent.find(one_pre_arg, cur_start)
                 if one_arg_s == -1:
@@ -184,12 +167,6 @@ def cal_LLM_res(filepath):
                 one_arg_e = one_arg_s + len(one_pre_arg) - 1
                 cur_start = one_arg_e + 1
 
-                sent_ids = [sentindex for sentindex, sentvalue in enumerate(input_sent.split()) if sentvalue == one_pre_arg.split()[0]]
-                for sent_id in sent_ids:
-                    if sum([len(x) + 1 for x in input_sent.split()[:sent_id]]) == one_arg_s:
-                        one_arg_s = sent_id
-                        one_arg_e = sent_id + len(one_pre_arg.split()) - 1
-                        
                 if one_arg_s >= len(input_sent.split()) or one_arg_e >= len(input_sent.split()) or ' '.join(input_sent.split()[one_arg_s: one_arg_e + 1]) != one_pre_arg:
                     continue
             
@@ -314,5 +291,4 @@ def cal_metrics(all_gold, all_pred):
     )     
     return result
 if __name__ == '__main__':
-    x, y = cal_LLM_res('/data/sdb2/lkt/eeqga/utils/test-qwen2.5-72b-int4-ACE05.jsonl')
-    print(cal_metrics(x,y))
+    pass
